@@ -6,7 +6,7 @@ import mysql.connector
 from mysql.connector import Error
 
 
-def generateBoard(rows=5, cols=5):
+def generate_board(rows=5, cols=5):
     # import word bank
     word_bank_file = open("words.txt", "r")
     word_list = word_bank_file.read().splitlines()
@@ -30,7 +30,7 @@ def generateBoard(rows=5, cols=5):
     return board, team_cards, board_words, death_card
 
 
-def runQuery(query, return_result=True):
+def run_query(query, return_result=True):
     conn = None
     conn = mysql.connector.connect([DATABASE INFO)
     if conn.is_connected():
@@ -48,7 +48,7 @@ def runQuery(query, return_result=True):
 
 def update_guesses(user, correct):
     query_retrieve = "SELECT * from guesses where user_id = '%s'" %(user)
-    current_stats = runQuery(query_retrieve)
+    current_stats = run_query(query_retrieve)
 
     # insert new user
     if current_stats == None:
@@ -68,12 +68,12 @@ def update_guesses(user, correct):
             query_update = "UPDATE guesses SET incorrect_guesses = %s WHERE user_id = '%s'"
             args = (current_stats[2]+1, user)
 
-    runQuery(query_update %args, False)
+    run_query(query_update %args, False)
 
 
 def return_stats(user):
     query_retrieve = "SELECT * from guesses where user_id = '%s'" %(user)
-    results = runQuery(query_retrieve)
+    results = run_query(query_retrieve)
     str_results = '**Stats for user:** %s\nCorrect guesses: %d\nIncorrect guesses: %d' %(results[0], results[1], results[2])
     return str_results
 
@@ -81,7 +81,7 @@ def return_stats(user):
 class CodenamesGame():
     def __init__(self, clues=6):
         self.clues = clues
-        self.board, self.team_cards, self.all_cards, self.death_card = generateBoard()
+        self.board, self.team_cards, self.all_cards, self.death_card = generate_board()
         self.picked_cards = []
         self.errors = 0
         self.cards_left = 9
@@ -92,11 +92,11 @@ class CodenamesGame():
         self.clue = 0
         self.past_clues = []
         self.board_image = "img.png"
-        self.makeImage()
+        self.make_image()
 
 
     # from: https://github.com/joaoperfig/discordBoggle
-    def makeImage(self):
+    def make_image(self):
         image = Image.new("RGBA", (1000,500), (36,84,99))
         font = ImageFont.truetype("futurab.otf", 20)
         y = 50
@@ -119,18 +119,18 @@ class CodenamesGame():
         image.save(self.board_image)
 
 
-    def setSpymaster(self, spymaster_user):
+    def set_spymaster(self, spymaster_user):
         self.spymaster = spymaster_user
 
 
-    def giveClue(self, clue, guesses):
+    def give_clue(self, clue, guesses):
         self.guesses = guesses
         self.clue = clue
         self.past_clues += [self.clue]
         self.clues -= 1
 
 
-    def pickCard(self, picked_card, user):
+    def pick_card(self, picked_card, user):
         correct_guess = False
 
         if picked_card in self.picked_cards or picked_card not in self.all_cards:
@@ -140,7 +140,7 @@ class CodenamesGame():
             self.found_cards += [picked_card]
             self.errors += 1
             self.guesses = 0
-            self.makeImage()
+            self.make_image()
             update_guesses(user, correct_guess)
             return 'death'
 
@@ -154,7 +154,7 @@ class CodenamesGame():
                             self.cards_left -= 1
                             correct_guess = True
                             self.found_cards += [picked_card]
-                            self.makeImage()
+                            self.make_image()
 
             update_guesses(user, correct_guess)
 
@@ -172,7 +172,7 @@ class CodenamesGame():
             self.missed_cards += [picked_card]
             self.errors += 1
             self.guesses = 0
-            self.makeImage()
+            self.make_image()
 
             if self.clues > 0:
                 return 'turn_lost'
@@ -180,7 +180,7 @@ class CodenamesGame():
             return 'incorrect_and_game_lost'
 
 
-    def gameOver(self):
+    def game_over(self):
         self.clues = 0
         self.picked_cards = []
         self.errors = 0
