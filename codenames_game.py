@@ -147,14 +147,11 @@ class CodenamesGame():
         else:
             self.picked_cards += [picked_card]
             self.guesses -= 1
-            for row in self.board:
-                for card in row:
-                    if card == picked_card:
-                        if picked_card in self.team_cards:
-                            self.cards_left -= 1
-                            correct_guess = True
-                            self.found_cards += [picked_card]
-                            self.make_image()
+            if picked_card in self.team_cards:
+                self.cards_left -= 1
+                correct_guess = True
+                self.found_cards += [picked_card]
+                self.make_image()
 
             update_guesses(user, correct_guess)
 
