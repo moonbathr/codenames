@@ -30,7 +30,7 @@ class CodenamesBot(discord.Client):
 
         if message.content.startswith('&spymaster'):
             if self.game.spymaster == None:
-                self.game.setSpymaster(str(message.author))
+                self.game.set_spymaster(str(message.author))
                 await message.channel.send('Spymaster set: ' + self.game.spymaster + '. Clue format: `&clue place, 5`.')
                 await message.author.send("These are your words: " + ', '.join(self.game.team_cards))
                 await message.author.send("This is the death card: " + self.game.death_card)
@@ -43,7 +43,7 @@ class CodenamesBot(discord.Client):
                     try:
                         guesses = int(message.content.split(', ')[1])
                         clue = message.content.split('&clue ')[1].split(',')[0]
-                        self.game.giveClue(clue, guesses)
+                        self.game.give_clue(clue, guesses)
                         await message.channel.send('**Clue:** ' + self.game.clue + '\n**Guesses:** ' + str(self.game.guesses) + '\nPlayers can select cards with `&pick word`.')
                     except:
                         await message.channel.send('Invalid clue format. Example format: `&clue city, 3')
@@ -53,7 +53,7 @@ class CodenamesBot(discord.Client):
         if message.content.startswith('&pick'):
             if self.game.guesses > 0:
                 picked_card = message.content.split('&pick ')[1]
-                turn_result = self.game.pickCard(picked_card, str(message.author))
+                turn_result = self.game.pick_card(picked_card, str(message.author))
                 turn_responses = {'unavailable': 'Card unavailable on the board.',
                                'death': 'OH NO. You picked the death card. Game over!',
                                'turn_continues': 'You found one! There are still %d guesses remaining this turn.' %(self.game.guesses),
@@ -64,12 +64,12 @@ class CodenamesBot(discord.Client):
                 await message.channel.send(turn_responses[turn_result])
                 await message.channel.send(file=discord.File(self.game.board_image))
                 if 'GAME OVER' in turn_responses[turn_result]:
-                    self.game.gameOver()
+                    self.game.game_over()
 
         if message.content.startswith('&end game'):
             if (self.game.spymaster == str(message.author)) or (role in message.author.roles):
             await message.channel.send('Game ended.')
-            self.game.gameOver()
+            self.game.game_over()
 
         if message.content.startswith('&game stats'):
             if self.game.board != None:
